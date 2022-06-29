@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const morgan = require('morgan')
 
 app.use(express.json())
 
@@ -24,16 +25,16 @@ let persons = [
     const message = `<h>Phonebook has info for ${persons.length} people</h><div>${Date()}`
 
 
-    app.get('/info', (req, res) => {
+    app.get('/info', morgan('tiny'), (req, res) => {
         res.send(message)
         console.log("moi")
       })
       
-      app.get('/api/persons', (req, res) => {
+      app.get('/api/persons', morgan('tiny'), (req, res) => {
         res.json(persons)
       })
 
-      app.get('/api/persons/:id', (request, response) => {
+      app.get('/api/persons/:id', morgan('tiny'), (request, response) => {
         const id = Number(request.params.id)
         const person = persons.find(person => person.id === id)
         if (person) {
@@ -43,14 +44,14 @@ let persons = [
         }
       })
 
-      app.delete('/api/persons/:id', (request, response) => {
+      app.delete('/api/persons/:id', morgan('tiny'), (request, response) => {
         const id = Number(request.params.id)
         persons = persons.filter(person => person.id !== id)
       
         response.status(204).end()
       })
 
-      app.post('/api/persons', (request, response) => {
+      app.post('/api/persons', morgan('tiny'), (request, response) => {
         const body = request.body
         console.log(body.name)
 
