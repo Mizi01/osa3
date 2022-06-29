@@ -19,12 +19,26 @@ let persons = [
     }
     ]
 
-    app.get('/', (req, res) => {
-        res.send('<h1>Hello World!</h1>')
+    const message = `<h>Phonebook has info for ${persons.length} people</h><div>${Date()}`
+
+
+    app.get('/info', (req, res) => {
+        res.send(message)
+        console.log("moi")
       })
       
       app.get('/api/persons', (req, res) => {
         res.json(persons)
+      })
+
+      app.get('/api/persons/:id', (request, response) => {
+        const id = Number(request.params.id)
+        const person = persons.find(person => person.id === id)
+        if (person) {
+            response.json(person)
+        }else{
+            response.status(404).end()
+        }
       })
       
       const PORT = 3001
