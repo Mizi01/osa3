@@ -1,10 +1,12 @@
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
+const cors = require('cors')
 
 app.use(express.json())
+app.use(cors)
 
-/*tehtävä 3.8*/
+/*tehtävä 3.9*/
 
 let persons = [
     {
