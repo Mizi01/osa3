@@ -6,29 +6,22 @@ const cors = require('cors')
 require('dotenv').config()
 const Person = require('./models/person')
 
+app.use(express.static('build'))
 app.use(express.json())
 app.use(cors())
-app.use(express.static('build'))
 
-/*tehtävä 3.9*/
 
-let persons = [
-    {
-        id: 1,
-        name: "Jaska Jokunen",
-        number: 1056846156
-    },
-    {
-        id:2,
-        name: "Matti Meikäläinen",
-        number: 5615684866
-    },
-    {
-        id:3,
-        name: "John Doe",
-        number: 418848445
-    }
-    ]
+/*tehtävä 3.16*/
+
+let persons = []
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if(error.name === 'CastError') {
+    return response.status(400).send({error: 'malformatted id'})
+  }
+  next(error)
+}
 
     const message = `<h>Phonebook has info for ${persons.length} people</h><div>${Date()}`
 
@@ -44,17 +37,24 @@ let persons = [
         })
       })
 
-      app.get('/api/persons/:id', (request, response) => {
-        Person.findById(request.params.id).then(note => {
-          response.json(note)
+      app.get('/api/persons/:id', morgan('tiny'), (request, response, next) => {
+        Person.findById(request.params.id).then(person => {
+          if (person) {
+            response.json(person)
+          } else {
+            console.log("person not foundd")
+            response.status(404).end()
+          }
         })
+        .catch(error => next(error))
       })
 
-      app.delete('/api/persons/:id', morgan('tiny'), (request, response) => {
-        const id = Number(request.params.id)
-        persons = persons.filter(person => person.id !== id)
-      
-        response.status(204).end()
+      app.delete('/api/persons/:id', morgan('tiny'), (request, response, next) => {
+        Person.findByIdAndRemove(request.params.id)
+        .then(result => {
+          response.status(204).end()
+        })
+        .catch(error => next(error))
       })
 
       app.post('/api/persons', (request, response) => {
@@ -72,6 +72,8 @@ let persons = [
             response.json(savedPerson)
           })
       })
+
+      app.use(errorHandler)
       
       const PORT = process.env.PORT || 3001
       app.listen(PORT, () => {
