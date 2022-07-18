@@ -9,6 +9,8 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(cors())
 
+morgan.token('bodyJSON', (request, response) => JSON.stringify(request.body))
+
 
 /*tehtävä 3.16*/
 
@@ -48,10 +50,10 @@ app.delete('/api/persons/:id', morgan('tiny'), (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response, next) => {
+app.post('/api/persons', morgan(':method :url :status :bodyJSON'), (request, response, next) => {
   const body = request.body
   if (body.name === undefined) {
-    return response.status(400).json({ error: 'content missing' })
+    return response.status(400).json({ error: 'contentf missing' })
   }
 
   const person = new Person({
