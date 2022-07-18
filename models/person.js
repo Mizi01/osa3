@@ -11,13 +11,23 @@ mongoose.connect(url)
     console.log('error connecting to MongoDB:', error.message)
   })
 
+const valitador = (number) => {
+  return /^[0-9]{2,3}-[0-9]{6,8}$/.test(number)
+}
+
+const custom = [valitador, 'try xx-xxxxxx or xxx-xxxxxx']
+
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
     minlength: 3,
     required: true
   },
-  number: String,
+  number: {
+    type: String,
+    minlength: 8,
+    validate: custom
+  }
 })
 
 personSchema.set('toJSON', {
